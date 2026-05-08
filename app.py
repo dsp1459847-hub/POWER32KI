@@ -51,7 +51,6 @@ def apply_strict_patterns(val_str):
 
 # --- UI HELPER FOR SQUARE BOX (PASS/FAIL TRACKER) ---
 def render_jodi_box(jodis, passed_set=None):
-    """Jodis ko chakor dabbe mein wrap karega. Jo pass honge unhe Green karega."""
     if not jodis:
         return "<p>Pending / N/A</p>"
     
@@ -166,7 +165,8 @@ if uploaded_file is not None:
                             st.markdown("#### 🔄 Jodis Frequency")
                             st.write("(Kaunsa number kitni baar aaya)")
                             
-                            # defaultdict is removed, using standard dictionary implementation
+                            # Yahan se defaultdict poori tarah hata diya gaya hai! 
+                            # Ab simple basic dictionary use ho rahi hai.
                             jodis_by_freq = {}
                             for jodi, count in freq_counter.items():
                                 if count not in jodis_by_freq:
@@ -241,8 +241,8 @@ if uploaded_file is not None:
                     else:
                         st.warning("Kal ki shifton mein koi valid number nahi mila.")
     except Exception as e:
-        st.error(f"App mein koi error aayi hai. Detail: {e}")
+        st.error(f"App mein error aayi hai. Detail: {e}")
 
 else:
     st.info("Kripya engine chalane ke liye 0DSP0 sheet upload karein.")
-        
+               
