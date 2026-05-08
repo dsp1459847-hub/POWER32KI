@@ -1,8 +1,6 @@
 import pandas as pd
 import streamlit as st
-import numpy as np
-import re
-from collections import Counter, defaultdict  # Ensure all necessary modules are loaded properly at the top.
+from collections import Counter
 
 # Set Streamlit Page Config
 st.set_page_config(layout="wide")
@@ -168,8 +166,11 @@ if uploaded_file is not None:
                             st.markdown("#### 🔄 Jodis Frequency")
                             st.write("(Kaunsa number kitni baar aaya)")
                             
-                            jodis_by_freq = defaultdict(list)
+                            # defaultdict is removed, using standard dictionary implementation
+                            jodis_by_freq = {}
                             for jodi, count in freq_counter.items():
+                                if count not in jodis_by_freq:
+                                    jodis_by_freq[count] = []
                                 jodis_by_freq[count].append(jodi)
                                 
                             for count in sorted(jodis_by_freq.keys(), reverse=True):
@@ -240,8 +241,8 @@ if uploaded_file is not None:
                     else:
                         st.warning("Kal ki shifton mein koi valid number nahi mila.")
     except Exception as e:
-        st.error(f"Error reading file or calculating. Details: {e}")
+        st.error(f"App mein koi error aayi hai. Detail: {e}")
 
 else:
     st.info("Kripya engine chalane ke liye 0DSP0 sheet upload karein.")
-
+        
