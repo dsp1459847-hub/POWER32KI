@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 from collections import Counter
 
-# Set Streamlit Page Config (Yeh hamesha sabse upar hona chahiye)
+# Set Streamlit Page Config
 st.set_page_config(layout="wide")
 
 st.title("MAYA AI: 32-Pattern Strict Boundary Engine (Live Pass Tracker)")
@@ -49,7 +49,7 @@ def apply_strict_patterns(val_str):
             
     return valid_jodis
 
-# --- UI HELPER FOR SQUARE BOX (PASS/FAIL TRACKER) ---
+# --- UI HELPER FOR SQUARE BOX (PASS/FAIL TRACKER) - BUG FIXED HERE ---
 def render_jodi_box(jodis, passed_set=None):
     if not jodis:
         return "<p>Pending / N/A</p>"
@@ -60,27 +60,17 @@ def render_jodi_box(jodis, passed_set=None):
     html = "<div style='display: flex; flex-wrap: wrap; gap: 8px; padding: 5px; align-items: flex-end;'>"
     for jodi in jodis:
         if jodi in passed_set:
-            # HARA DABBA (GREEN BOX) FOR PASSED JODI
-            html += f"""
-            <div style='display:flex; flex-direction:column; align-items:center;'>
-                <span style='font-size:11px; font-weight:bold; color:#28a745; margin-bottom:2px;'>✅ PASS</span>
-                <span style='background-color: #28a745; color: #ffffff; padding: 4px 8px; border-radius: 4px; border: 2px solid #155724; font-weight: bold; font-size: 16px; box-shadow: 0px 0px 5px rgba(40,167,69,0.6);'>{jodi}</span>
-            </div>
-            """
+            # HARA DABBA (GREEN BOX) - Fixed HTML formatting
+            html += "<div style='display:flex; flex-direction:column; align-items:center;'><span style='font-size:11px; font-weight:bold; color:#28a745; margin-bottom:2px;'>✅ PASS</span><span style='background-color: #28a745; color: #ffffff; padding: 4px 8px; border-radius: 4px; border: 2px solid #155724; font-weight: bold; font-size: 16px; box-shadow: 0px 0px 5px rgba(40,167,69,0.6);'>" + str(jodi) + "</span></div>"
         else:
-            # NORMAL WHITE BOX
-            html += f"""
-            <div style='display:flex; flex-direction:column; justify-content:flex-end;'>
-                <span style='background-color: #ffffff; color: #000000; padding: 4px 8px; border-radius: 4px; border: 1px solid #555; font-weight: bold; font-size: 15px;'>{jodi}</span>
-            </div>
-            """
+            # NORMAL WHITE BOX - Fixed HTML formatting
+            html += "<div style='display:flex; flex-direction:column; justify-content:flex-end;'><span style='background-color: #ffffff; color: #000000; padding: 4px 8px; border-radius: 4px; border: 1px solid #555; font-weight: bold; font-size: 15px;'>" + str(jodi) + "</span></div>"
     html += "</div>"
     return html
 
-# --- MAIN APP LOGIC ---
+# Main App Logic
 if uploaded_file is not None:
     try:
-        # File Reading
         if uploaded_file.name.endswith('.csv'):
             df = pd.read_csv(uploaded_file)
         else:
@@ -94,7 +84,6 @@ if uploaded_file is not None:
         for c in cols:
             df[c] = df[c].apply(get_val_str)
 
-        # UI Date Selection
         st.markdown("### 📅 Tareekh Chunein")
         max_valid_date = df['DATE'].max().date()
         selected_date = st.date_input("Aaj ki Tareekh:", value=max_valid_date, 
@@ -117,14 +106,14 @@ if uploaded_file is not None:
                     date_kal_str = df.iloc[idx_kal]['DATE'].strftime('%d-%m-%Y')
                     date_aaj_str = df.iloc[idx_aaj]['DATE'].strftime('%d-%m-%Y')
                     
-                    # 1. AAJ KYA KHULA HAI? (LIVE TRACKER SET)
+                    # --- AAJ KYA KHULA HAI? (LIVE TRACKER SET) ---
                     aaj_actual_vals = set()
                     for c in cols:
                         val = df.iloc[idx_aaj][c]
                         if val and len(val) == 2:
                             aaj_actual_vals.add(val)
                     
-                    # 2. KAL KI SHIFTS PAR PATTERN
+                    # --- KAL KI SHIFTS PAR PATTERN ---
                     st.markdown(f"<h3 style='color:#0056b3; border-bottom:2px solid #0056b3; padding-bottom:5px;'>1️⃣ KAL KI SHIFTS ({date_kal_str}) KI PREDICTION</h3>", unsafe_allow_html=True)
                     
                     all_kal_jodis = []
@@ -141,7 +130,7 @@ if uploaded_file is not None:
                             st.markdown(render_jodi_box(generated_jodis, passed_set=aaj_actual_vals), unsafe_allow_html=True)
                             st.markdown("</div>", unsafe_allow_html=True)
 
-                    # 3. AAJ KI SHIFTS PAR PATTERN
+                    # --- AAJ KI SHIFTS PAR PATTERN ---
                     st.markdown(f"<h3 style='color:#0056b3; border-bottom:2px solid #0056b3; padding-bottom:5px; margin-top:20px;'>2️⃣ AAJ KI SHIFTS ({date_aaj_str}) SE KAL KI PREDICTION</h3>", unsafe_allow_html=True)
                     
                     grid_aaj = st.columns(3)
@@ -155,7 +144,7 @@ if uploaded_file is not None:
                             st.markdown(render_jodi_box(generated_jodis), unsafe_allow_html=True)
                             st.markdown("</div>", unsafe_allow_html=True)
 
-                    # 4. FREQUENCY & ANALYSIS
+                    # --- FREQUENCY & ANALYSIS ---
                     st.markdown(f"<h3 style='color:#28a745; border-bottom:2px solid #28a745; padding-bottom:5px; margin-top:20px;'>3️⃣ DATA ANALYSIS (Kal Ke Numbers Se)</h3>", unsafe_allow_html=True)
                     
                     if all_kal_jodis:
@@ -167,7 +156,6 @@ if uploaded_file is not None:
                             st.markdown("#### 🔄 Jodis Frequency")
                             st.write("(Kaunsa number kitni baar aaya)")
                             
-                            # COMPLETELY REMOVED DEFAULTDICT - USING STANDARD DICTIONARY
                             jodis_by_freq = {}
                             for jodi, count in freq_counter.items():
                                 if count not in jodis_by_freq:
@@ -201,7 +189,7 @@ if uploaded_file is not None:
                                 st.markdown(f"<h3 style='color:#155724; margin:0;'>🔥 Sabse Zyada Aane Wala Bahar Ank: {top_bahar}</h3>", unsafe_allow_html=True)
                                 st.markdown("</div>", unsafe_allow_html=True)
 
-                        # 5. FINAL VIP NUMBERS
+                        # --- FINAL VIP NUMBERS ---
                         st.markdown(f"<h3 style='color:#dc3545; border-bottom:2px solid #dc3545; padding-bottom:5px; margin-top:30px;'>🔥 FINAL VIP NUMBERS (Filtered) 🔥</h3>", unsafe_allow_html=True)
                         st.write("Jo numbers 1 se zyada baar aaye hain, PLUS jinke bahar 'Top Bahar' ank hai.")
                         
@@ -219,21 +207,13 @@ if uploaded_file is not None:
                         st.markdown(f"<div style='background-color:#fff3cd; padding:15px; border-radius:10px; border:2px dashed #ffe8a1; text-align:center;'>", unsafe_allow_html=True)
                         st.markdown(f"<h4 style='color:#856404; margin-top:0;'>👑 Total VIP Numbers: {len(vips_list)} 👑</h4>", unsafe_allow_html=True)
                         
+                        # BUG FIXED HERE AS WELL (Single line HTML string)
                         html_vip = "<div style='display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; align-items: flex-end;'>"
                         for vip in vips_list:
                             if vip in aaj_actual_vals:
-                                html_vip += f"""
-                                <div style='display:flex; flex-direction:column; align-items:center;'>
-                                    <span style='font-size:12px; font-weight:bold; color:#28a745; margin-bottom:2px;'>✅ MEGA PASS</span>
-                                    <span style='background-color: #28a745; color: #fff; padding: 6px 12px; border-radius: 5px; border: 2px solid #155724; font-weight: bold; font-size: 18px; box-shadow: 0px 0px 8px rgba(40,167,69,0.8);'>{vip}</span>
-                                </div>
-                                """
+                                html_vip += "<div style='display:flex; flex-direction:column; align-items:center;'><span style='font-size:12px; font-weight:bold; color:#28a745; margin-bottom:2px;'>✅ MEGA PASS</span><span style='background-color: #28a745; color: #fff; padding: 6px 12px; border-radius: 5px; border: 2px solid #155724; font-weight: bold; font-size: 18px; box-shadow: 0px 0px 8px rgba(40,167,69,0.8);'>" + str(vip) + "</span></div>"
                             else:
-                                html_vip += f"""
-                                <div style='display:flex; flex-direction:column; justify-content:flex-end;'>
-                                    <span style='background-color: #ffc107; color: #000; padding: 6px 12px; border-radius: 5px; border: 2px solid #b38600; font-weight: bold; font-size: 18px;'>{vip}</span>
-                                </div>
-                                """
+                                html_vip += "<div style='display:flex; flex-direction:column; justify-content:flex-end;'><span style='background-color: #ffc107; color: #000; padding: 6px 12px; border-radius: 5px; border: 2px solid #b38600; font-weight: bold; font-size: 18px;'>" + str(vip) + "</span></div>"
                         html_vip += "</div>"
                         st.markdown(html_vip, unsafe_allow_html=True)
                             
@@ -242,7 +222,8 @@ if uploaded_file is not None:
                     else:
                         st.warning("Kal ki shifton mein koi valid number nahi mila.")
     except Exception as e:
-        # Ab agar koi bhi chhoti moti error aayegi toh app crash nahi hogi, balki screen par saaf likh kar aayega ki kya dikkat hai
         st.error(f"App mein error aayi hai. Detail: {e}")
+
 else:
     st.info("Kripya engine chalane ke liye 0DSP0 sheet upload karein.")
+                        
