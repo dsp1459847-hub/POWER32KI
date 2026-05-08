@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 from collections import Counter
 
-# Set Streamlit Page Config
+# Set Streamlit Page Config (Yeh hamesha sabse upar hona chahiye)
 st.set_page_config(layout="wide")
 
 st.title("MAYA AI: 32-Pattern Strict Boundary Engine (Live Pass Tracker)")
@@ -77,9 +77,10 @@ def render_jodi_box(jodis, passed_set=None):
     html += "</div>"
     return html
 
-# Main App Logic
+# --- MAIN APP LOGIC ---
 if uploaded_file is not None:
     try:
+        # File Reading
         if uploaded_file.name.endswith('.csv'):
             df = pd.read_csv(uploaded_file)
         else:
@@ -93,6 +94,7 @@ if uploaded_file is not None:
         for c in cols:
             df[c] = df[c].apply(get_val_str)
 
+        # UI Date Selection
         st.markdown("### 📅 Tareekh Chunein")
         max_valid_date = df['DATE'].max().date()
         selected_date = st.date_input("Aaj ki Tareekh:", value=max_valid_date, 
@@ -115,14 +117,14 @@ if uploaded_file is not None:
                     date_kal_str = df.iloc[idx_kal]['DATE'].strftime('%d-%m-%Y')
                     date_aaj_str = df.iloc[idx_aaj]['DATE'].strftime('%d-%m-%Y')
                     
-                    # --- AAJ KYA KHULA HAI? (LIVE TRACKER SET) ---
+                    # 1. AAJ KYA KHULA HAI? (LIVE TRACKER SET)
                     aaj_actual_vals = set()
                     for c in cols:
                         val = df.iloc[idx_aaj][c]
                         if val and len(val) == 2:
                             aaj_actual_vals.add(val)
                     
-                    # --- KAL KI SHIFTS PAR PATTERN ---
+                    # 2. KAL KI SHIFTS PAR PATTERN
                     st.markdown(f"<h3 style='color:#0056b3; border-bottom:2px solid #0056b3; padding-bottom:5px;'>1️⃣ KAL KI SHIFTS ({date_kal_str}) KI PREDICTION</h3>", unsafe_allow_html=True)
                     
                     all_kal_jodis = []
@@ -139,7 +141,7 @@ if uploaded_file is not None:
                             st.markdown(render_jodi_box(generated_jodis, passed_set=aaj_actual_vals), unsafe_allow_html=True)
                             st.markdown("</div>", unsafe_allow_html=True)
 
-                    # --- AAJ KI SHIFTS PAR PATTERN ---
+                    # 3. AAJ KI SHIFTS PAR PATTERN
                     st.markdown(f"<h3 style='color:#0056b3; border-bottom:2px solid #0056b3; padding-bottom:5px; margin-top:20px;'>2️⃣ AAJ KI SHIFTS ({date_aaj_str}) SE KAL KI PREDICTION</h3>", unsafe_allow_html=True)
                     
                     grid_aaj = st.columns(3)
@@ -153,7 +155,7 @@ if uploaded_file is not None:
                             st.markdown(render_jodi_box(generated_jodis), unsafe_allow_html=True)
                             st.markdown("</div>", unsafe_allow_html=True)
 
-                    # --- FREQUENCY & ANALYSIS ---
+                    # 4. FREQUENCY & ANALYSIS
                     st.markdown(f"<h3 style='color:#28a745; border-bottom:2px solid #28a745; padding-bottom:5px; margin-top:20px;'>3️⃣ DATA ANALYSIS (Kal Ke Numbers Se)</h3>", unsafe_allow_html=True)
                     
                     if all_kal_jodis:
@@ -165,8 +167,7 @@ if uploaded_file is not None:
                             st.markdown("#### 🔄 Jodis Frequency")
                             st.write("(Kaunsa number kitni baar aaya)")
                             
-                            # Yahan se defaultdict poori tarah hata diya gaya hai! 
-                            # Ab simple basic dictionary use ho rahi hai.
+                            # COMPLETELY REMOVED DEFAULTDICT - USING STANDARD DICTIONARY
                             jodis_by_freq = {}
                             for jodi, count in freq_counter.items():
                                 if count not in jodis_by_freq:
@@ -200,7 +201,7 @@ if uploaded_file is not None:
                                 st.markdown(f"<h3 style='color:#155724; margin:0;'>🔥 Sabse Zyada Aane Wala Bahar Ank: {top_bahar}</h3>", unsafe_allow_html=True)
                                 st.markdown("</div>", unsafe_allow_html=True)
 
-                        # --- FINAL VIP NUMBERS ---
+                        # 5. FINAL VIP NUMBERS
                         st.markdown(f"<h3 style='color:#dc3545; border-bottom:2px solid #dc3545; padding-bottom:5px; margin-top:30px;'>🔥 FINAL VIP NUMBERS (Filtered) 🔥</h3>", unsafe_allow_html=True)
                         st.write("Jo numbers 1 se zyada baar aaye hain, PLUS jinke bahar 'Top Bahar' ank hai.")
                         
@@ -241,8 +242,7 @@ if uploaded_file is not None:
                     else:
                         st.warning("Kal ki shifton mein koi valid number nahi mila.")
     except Exception as e:
+        # Ab agar koi bhi chhoti moti error aayegi toh app crash nahi hogi, balki screen par saaf likh kar aayega ki kya dikkat hai
         st.error(f"App mein error aayi hai. Detail: {e}")
-
 else:
     st.info("Kripya engine chalane ke liye 0DSP0 sheet upload karein.")
-               
